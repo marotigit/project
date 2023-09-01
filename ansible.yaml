@@ -6,12 +6,12 @@
   tasks:
   - name: copy file
     copy:
-      src: /target/LoginWebApp.war
+      src: target/LoginWebApp.war
       dest: /opt/docker
 
   - name: copy file
     copy:
-      src: ./ Dockerfile
+      src: ./Dockerfile
       dest: /opt/docker
 
   - name : remove old images
