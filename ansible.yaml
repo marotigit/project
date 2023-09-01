@@ -1,0 +1,36 @@
+---
+- name: playbook
+  hosts: tomcat-as
+  become: true
+
+  tasks:
+  - name: copy file
+    copy:
+      src: /target/LoginWebApp.war
+      dest: /opt/docker
+
+  - name: copy file
+    copy:
+      src: ./ Dockerfile
+      dest: /opt/docker
+
+  - name : remove old images
+    command: docker system prune -a -f
+    args:
+      chdir: /opt/docker
+
+  - name: creating new docker image
+    command: docker build -t tomcat:1.0  .
+    args:
+      chdir: /opt/docker
+
+  - name: creating new  container
+    command: docker run -itdp 8080:8080 --name my-container tomcat:1.0 bash
+    args:
+      chdir: /opt/docker
+
+  - name: tagging the new image
+    command: docker tag tomcat:1.0 maroti123/tomcat:1.0
+
+  - name: push docker image on docker hub
+    command: docker push maroti123/tomcat:1.0
