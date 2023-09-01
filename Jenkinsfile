@@ -1,46 +1,26 @@
 pipeline {
-agent {
-label {
-		label "built-in"
-		customWorkspace "/data/project-myapp"
-		
-		}
-		}
-		
-	stages {
-		
-		stage ('CLEAN_OLD_M2') {
-			
-			steps {
-				sh "rm -rf /home/saccount/.m2/repository"
-				
-			}
-			
-		}
-	
-		stage ('MAVEN_BUILD') {
-		
-			steps {
-						
-						sh "mvn clean package"
-			
-			}
-			
-		
-		}
-		
-		stage ('COPY_WAR_TO_Server'){
-		
-				steps {
-						
-						sh "scp -r target/LoginWebApp.war saccount@10.0.2.51:/data/project/wars"
-
-						}
-				
-				}
-	
-	
-	
-	}
-		
+    agent any
+    environment {
+        PATH = "/root/buildtool/apache-maven-3.9.4/bin:$PATH"
+    }
+    stages {
+        stage('scm') {
+            steps {
+                git 'https://github.com/marotigit/project.git'
+            }
+        }
+        stage('deploy') {
+            steps {
+                sh "mvn clean install"
+            
+               }
+            }
+         stage('ansible-playbook') {
+            steps {
+                
+             ansiblePlaybook installation: 'ansible', inventory: 'inventory file', playbook: 'ansible.yaml'
+                
+            }
+        }  
+    }
 }
